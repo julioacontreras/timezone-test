@@ -1,6 +1,5 @@
 <html>
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.9.1/axios.min.js"></script>
 </head>
 <body>
@@ -39,9 +38,11 @@
         if (res.status === 200) {
           const timeZoneLocalInMinutesOffset = Number(res.data.data.datetime.offset_minutes)
           const timeZoneInMinutes = 120
+          const countryCode = res.data.data.country_code
           const now = new Date()
           const el = document.getElementById('console')
           el.innerHTML = `
+            countryCode = ${countryCode}
             timeZoneLocalInMinutesOffset = ${timeZoneLocalInMinutesOffset}
             timeZoneInMinutes = ${timeZoneInMinutes}
             dtStart = ${getTime('08:00:00')}
