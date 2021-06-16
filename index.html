@@ -1,0 +1,54 @@
+<html>
+<head>
+  <script src="assets/js/axios.min.js"></script>
+</head>
+<body>
+  <script>
+    const getTime = (time) => {
+      const dt = new Date()
+      const el = time.split(':')
+      dt.setHours(
+        Number(el[0]),
+        Number(el[1]),
+        Number(el[2])
+      )
+      return dt
+    }
+    const fixTimeZone = (dt, timeZoneLocalInMinutesOffset, timeZoneInMinutes) => {
+      // remove time zone local
+      dt.setMinutes(dt.getMinutes() - timeZoneLocalInMinutesOffset);
+      // set time zone company
+      dt.setMinutes(dt.getMinutes() + timeZoneInMinutes);
+      return dt
+    }
+    const isTimeAvaliable = (timeZoneLocalInMinutesOffset, timeZoneInMinutes) => {
+      const now = new Date()
+      const start = getTime('08:00:00')
+      const finish = getTime('20:00:00')
+      const isAvaliable = (
+        (fixTimeZone(now, timeZoneLocalInMinutesOffset, timeZoneInMinutes) >= start) && 
+        (fixTimeZone(now, timeZoneLocalInMinutesOffset, timeZoneInMinutes) < finish)
+      )
+      return isAvaliable
+    }
+
+    axios.get('https://timezoneapi.io/api/ip/?token=aXlpuqQcxzjFJDBfimVe').then((res) => {
+      if (res.status === 200) {
+        const timeZoneLocalInMinutesOffset = Number(res.data.data.datetime.offset_minutes)
+        const timeZoneInMinutes = 120
+        const now = new Date()
+        console.log({
+          timeZoneLocalInMinutesOffset,
+          timeZoneInMinutes,
+          dtStart: getTime('08:00:00'),
+          dtFinish: getTime('20:00:00'),
+          dtNow: fixTimeZone(now, timeZoneLocalInMinutesOffset, timeZoneInMinutes),
+          isTimeAvaliable: isTimeAvaliable(timeZoneLocalInMinutesOffset, timeZoneInMinutes)
+        })
+      }
+    })
+
+  </script>
+</body>
+
+</html>
