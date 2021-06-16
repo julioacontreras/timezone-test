@@ -6,6 +6,7 @@
 <body>
   <textarea id="console" style="width: 100%; height: 400px;" rows="100"></textarea>
   <script>
+
     const getTime = (time) => {
       const dt = new Date()
       const el = time.split(':')
@@ -16,6 +17,7 @@
       )
       return dt
     }
+
     const fixTimeZone = (dt, timeZoneLocalInMinutesOffset, timeZoneInMinutes) => {
       // remove time zone local
       dt.setMinutes(dt.getMinutes() - timeZoneLocalInMinutesOffset);
@@ -23,33 +25,49 @@
       dt.setMinutes(dt.getMinutes() + timeZoneInMinutes);
       return dt
     }
-    const isTimeAvaliable = (timeZoneLocalInMinutesOffset, timeZoneInMinutes) => {
-      const now = new Date()
+
+    const isTimeAvaliable = (now) => {
       const start = getTime('08:00:00')
       const finish = getTime('20:00:00')
-      const isAvaliable = (
-        (fixTimeZone(now, timeZoneLocalInMinutesOffset, timeZoneInMinutes) >= start) && 
-        (fixTimeZone(now, timeZoneLocalInMinutesOffset, timeZoneInMinutes) < finish)
-      )
+      const isAvaliable = ((now >= start) && (now < finish))
       return isAvaliable
     }
 
     const formatDt = (dt) => {
       return moment(dt).format('DD/MM/YYYY HH:mm:ss'); 
     }
+
+    const render = (
+      timeZoneLocalInMinutesOffset,
+      timeZoneInMinutes,
+      countryCode,
+      now,
+      isAvaliable
+    ) => {
+      const el = document.getElementById('console')
+          el.innerHTML = `${countryCode}, isTimeAvaliable = ${isAvaliable}, tzLocal = ${timeZoneLocalInMinutesOffset}, tzSpain = ${timeZoneInMinutes}
+dtStart = ${formatDt(getTime('08:00:00'))}, dtFinish = ${formatDt(getTime('20:00:00'))},
+dtNow = ${formatDt(now)}
+          ` 
+    }
     
     window.onload = function() {
       axios.get('https://timezoneapi.io/api/ip/?token=aXlpuqQcxzjFJDBfimVe').then((res) => {
         if (res.status === 200) {
           const timeZoneLocalInMinutesOffset = Number(res.data.data.datetime.offset_minutes)
+          // const timeZoneLocalInMinutesOffset = -240
           const timeZoneInMinutes = 120
           const countryCode = res.data.data.country_code
-          const now = new Date()
-          const el = document.getElementById('console')
-          el.innerHTML = `${countryCode}, isTimeAvaliable = ${isTimeAvaliable(timeZoneLocalInMinutesOffset, timeZoneInMinutes)}, tzLocal = ${timeZoneLocalInMinutesOffset}, tzSpain = ${timeZoneInMinutes}
-dtStart = ${formatDt(getTime('08:00:00'))}, dtFinish = ${formatDt(getTime('20:00:00'))},
-dtNow = ${formatDt(fixTimeZone(now, timeZoneLocalInMinutesOffset, timeZoneInMinutes))}
-          ` 
+          const dt = new Date()
+          const now = fixTimeZone(dt, timeZoneLocalInMinutesOffset, timeZoneInMinutes)
+          const isAvaliable = isTimeAvaliable(now)
+          render(
+            timeZoneLocalInMinutesOffset,
+            timeZoneInMinutes,
+            countryCode,
+            now,
+            isAvaliable
+          )
         }
       })      
     };    
