@@ -1,6 +1,7 @@
 <html>
 <head>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.9.1/axios.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 </head>
 <body>
   <textarea id="console" style="width: 100%; height: 400px;" rows="100"></textarea>
@@ -32,6 +33,10 @@
       )
       return isAvaliable
     }
+
+    const formatDt = (dt) => {
+      return moment(dt).format('DD/MM/YYYY HH:mm:ss'); 
+    }
     
     window.onload = function() {
       axios.get('https://timezoneapi.io/api/ip/?token=aXlpuqQcxzjFJDBfimVe').then((res) => {
@@ -41,14 +46,9 @@
           const countryCode = res.data.data.country_code
           const now = new Date()
           const el = document.getElementById('console')
-          el.innerHTML = `
-            countryCode = ${countryCode}
-            timeZoneLocalInMinutesOffset = ${timeZoneLocalInMinutesOffset}
-            timeZoneInMinutes = ${timeZoneInMinutes}
-            dtStart = ${getTime('08:00:00')}
-            dtFinish = ${getTime('20:00:00')}
-            dtNow = ${fixTimeZone(now, timeZoneLocalInMinutesOffset, timeZoneInMinutes)}
-            isTimeAvaliable = ${isTimeAvaliable(timeZoneLocalInMinutesOffset, timeZoneInMinutes)}
+          el.innerHTML = `${countryCode}, isTimeAvaliable = ${isTimeAvaliable(timeZoneLocalInMinutesOffset, timeZoneInMinutes)}, tzLocal = ${timeZoneLocalInMinutesOffset}, tzSpain = ${timeZoneInMinutes}
+dtStart = ${formatDt(getTime('08:00:00'))}, dtFinish = ${formatDt(getTime('20:00:00'))},
+dtNow = ${formatDt(fixTimeZone(now, timeZoneLocalInMinutesOffset, timeZoneInMinutes))}
           ` 
         }
       })      
